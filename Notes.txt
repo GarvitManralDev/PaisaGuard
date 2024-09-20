@@ -1,0 +1,130 @@
+How to generate a seed Phrase - 
+Code (inside New User file only)-
+
+import { generateMnemonic, mnemonicToSeedSync } from "bip39";
+import { Buffer } from "buffer";
+
+window.Buffer = window.Buffer || Buffer;
+
+const [seedPhrase, setSeedPhrase] = useState(Array(12).fill(""));
+const [seed, setSeed] = useState();
+
+const getNewSeed = () => {
+    const mnemonic = generateMnemonic();
+    const mnemonicArr = mnemonic.split(" ");
+    setSeedPhrase(mnemonicArr);
+    const seed = mnemonicToSeedSync(mnemonic);
+    setSeed(seed);
+};
+
+useEffect(() => {
+    getNewSeed();
+}, []);
+
+Note - 
+1. we use buffer here cause website totally frontend mei bana raha hu toh buffer issue aa rha hai
+2. In react strict environment, getNewSeedPhrase is called twice.
+
+-----------------------------------------------------------------------------------------------------------------------
+To use node.js specific modules in react - 
+
+1. npm install vite-plugin-node-polyfills
+2. Make the below changes in vite.config file 
+
+Code - 
+    import { defineConfig } from 'vite'
+    import react from '@vitejs/plugin-react'
+    import { nodePolyfills } from 'vite-plugin-node-polyfills'
+
+    // https://vitejs.dev/config/
+    export default defineConfig({
+    plugins: [react(), nodePolyfills()],
+    })
+
+-----------------------------------------------------------------------------------------------------------------------
+Creating Solana Wallet - 
+
+Code - 
+import { derivePath } from "ed25519-hd-key";
+import { Keypair } from "@solana/web3.js";
+import nacl from "tweetnacl";
+import DisplaySolKeys from "../components/DisplaySolKeys";
+
+//Sol logic
+  const [solCurrentIndex, setSolCurrentIndex] = useState(0);
+  const [solanaKeys, setSolanaKeys] = useState([]);
+  const handleCreateSolanaWallet = () => {
+    const path = `m/44'/501'/${solCurrentIndex}'/0'`;
+    const derivedKey = derivePath(path, seed.toString("hex")).key;
+    const secret = nacl.sign.keyPair.fromSeed(derivedKey).secretKey;
+    const keypair = Keypair.fromSecretKey(secret);
+    setSolanaKeys([
+      ...solanaKeys,
+      [keypair.publicKey.toBytes(), keypair.secretKey],
+    ]);
+    setSolCurrentIndex(solCurrentIndex + 1);
+  };
+
+Explanation of handleCreateSolanaWallet function - 
+1. Generate Path: const path = m/44'/501'/${currentIndex}'/0'; creates a derivation path for the Solana wallet, 
+                  incorporating the currentIndex to derive a unique keypair.
+
+2. Derive Key: const derivedKey = derivePath(path, seed.toString("hex")).key; 
+               derives a new key from the given path and the seed phrase converted to a hex string.
+
+3. Generate Keypair: const secret = nacl.sign.keyPair.fromSeed(derivedKey).secretKey; 
+                     creates a keypair using the nacl library, extracting the secret key.
+
+4. Create Solana Keypair: const keypair = Keypair.fromSecretKey(secret); 
+                          constructs a Solana Keypair object using the derived secret key.
+
+5. Update State: setSolanaKeys([ ...solanaKeys, [keypair.publicKey.toBytes(), keypair.secretKey], ]); 
+                 appends the new keypair's public key (as a byte array) and secret key to the solanaKeys state array.
+
+6. Increment Index: setCurrentIndex(currentIndex + 1); 
+                    increments the currentIndex for the next keypair derivation.
+
+Note - A. derivePath(path,seed) needs seed to be a hex value
+       B. path mei ' include karna matt bhoolna 
+
+-------------------------------------------------------------------------------------------------------------------------------
+Display Logic for Sol wallet - 
+
+Just keep this in mind that we are storing keys in Unit8Array format but while displaying them, we are converting 
+them to different format using some functions defined in Display component File.
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+Creating Eth Wallet - 
+
+Code - 
+//Baaki we just need to import Bip for seed generation but that is already done above.
+import { Wallet, HDNodeWallet } from "ethers";
+import DisplayEthKeys from "../components/DisplayEthKeys";
+
+//Eth logic
+const [ethCurrentIndex, setEthCurrentIndex] = useState(0);
+const [etheriumKeys, setEtheriumKeys] = useState([]);
+const handleCreateEthereumWallet = () => {
+    const path = `m/44'/60'/${ethCurrentIndex}'/0'`;
+    const hdNode = HDNodeWallet.fromSeed(seed);
+    const child = hdNode.derivePath(path);
+    setEtheriumKeys([...etheriumKeys, [child.publicKey, child.privateKey]]);
+    console.log(etheriumKeys);
+    setEthCurrentIndex(ethCurrentIndex + 1);
+};
+
+Note - A. hum bas keys generation par ruk gaye but harkirat mei iske aage kuch wallets 
+          something bhi kiya tha.
+       B. Code is self-Explanatory and is much simple to understand as compared to sol.
+
+----------------------------------------------------------------------------------------------------------
+
+Display Logic for Eth wallet - 
+Here keys are obtained in hex only toh kuch zyada karne ki zarurat nhi
+
+----------------------------------------------------------------------------------------------------------
+
+
+
+
