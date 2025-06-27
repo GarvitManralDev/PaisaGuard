@@ -25,29 +25,8 @@ This project is a simple **React-based wallet generator** that allows users to c
 - **tweetnacl**
 - **localStorage** for persistence
 
+
 ---
-
-Solana:
-Uses ed25519-hd-key to derive key from path m/44'/501'/X'/0'
-
-Converts derived 32-byte seed into full keypair using tweetnacl
-
-Wraps it using Keypair.fromSecretKey from @solana/web3.js
-
-Ethereum:
-Uses ethers.HDNodeWallet to derive keys from path m/44'/60'/X'/0'
-
-Directly obtains public and private keys from derived node
-
-📌 Example Usage
-On home page, click "Generate New Seed" or enter an existing one.
-
-Create wallets for Solana and/or Ethereum.
-
-Keys are displayed and stored locally under your seed.
-
-Revisit with the same seed to restore your wallets.
-
 ⚠️ Disclaimer
 This project is for educational/demo purposes.
 
