@@ -2,6 +2,10 @@
 
 This project is a simple **React-based wallet generator** that allows users to create and manage **Solana** and **Ethereum** wallets using a single BIP-39 seed phrase. It supports deterministic key generation using standard derivation paths and securely stores generated keypairs in localStorage.
 
+![image](https://github.com/user-attachments/assets/96436442-0c09-4602-af08-8b3d210f753f)
+![image](https://github.com/user-attachments/assets/abb647e2-741d-4076-8bdb-74e58685bbed)
+
+
 ---
 
 ## 🚀 Features
@@ -28,9 +32,10 @@ This project is a simple **React-based wallet generator** that allows users to c
 
 ---
 ⚠️ Disclaimer
-This project is for educational/demo purposes.
 
-Do NOT use it to store real funds.
+- This project is for educational/demo purposes.
 
-Keys are stored in localStorage and are not encrypted.
+- Do NOT use it to store real funds.
+
+- Keys are stored in localStorage and are not encrypted.
 
